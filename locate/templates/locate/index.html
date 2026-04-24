@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Location Tracker</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 500px;
+            margin: auto;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 6px;
+            background: #38bdf8;
+            color: black;
+            cursor: pointer;
+        }
+
+        p {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🌍 Location Intelligence</h1>
+
+    <div class="card">
+        <h3>IP-Based Location</h3>
+        <p><b>IP:</b> <span id="ip"></span></p>
+        <p><b>Country:</b> <span id="country"></span></p>
+        <p><b>City:</b> <span id="city"></span></p>
+        <p><b>Region:</b> <span id="region"></span></p>
+        <p><b>Latitude:</b> <span id="lat"></span></p>
+        <p><b>Longitude:</b> <span id="lon"></span></p>
+        <p><b>Timezone:</b> <span id="timezone"></span></p>
+        <p><b>Postal Code:</b> <span id="postal"></span></p>
+
+        <button onclick="getExactLocation()">Get Exact Location</button>
+
+        <h3 style="margin-top:20px;">📍 Exact GPS Location</h3>
+        <p><b>Latitude:</b> <span id="gps-lat">-</span></p>
+        <p><b>Longitude:</b> <span id="gps-lon">-</span></p>
+    </div>
+
+<script>
+    // Fetch backend data
+    fetch('/api/location')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('ip').innerText = data.ip;
+            document.getElementById('country').innerText = data.country;
+            document.getElementById('city').innerText = data.city;
+            document.getElementById('region').innerText = data.region;
+            document.getElementById('lat').innerText = data.latitude;
+            document.getElementById('lon').innerText = data.longitude;
+            document.getElementById('timezone').innerText = data.timezone;
+            document.getElementById('postal').innerText = data.postal;
+        });
+
+    // Get precise GPS location
+    function getExactLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    document.getElementById('gps-lat').innerText = position.coords.latitude;
+                    document.getElementById('gps-lon').innerText = position.coords.longitude;
+                },
+                function(error) {
+                    alert("Permission denied or unavailable");
+                }
+            );
+        } else {
+            alert("Geolocation not supported");
+        }
+    }
+</script>
+
+</body>
+</html>
