@@ -29,4 +29,4 @@ def location_view(request):
     })
 
 def index(request):
-    return render(request, 'location/index.html')
+    return render(request, 'locate/index.html')
