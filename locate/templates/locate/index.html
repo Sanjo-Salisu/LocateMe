@@ -1,77 +1,198 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Location Tracker</title>
+    <title>Smart Location Intelligence</title>
+
     <style>
         body {
-            font-family: Arial;
-            background: #0f172a;
-            color: white;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: radial-gradient(circle at top, #0f172a, #020617);
+            color: #e2e8f0;
+        }
+
+        header {
             text-align: center;
-            padding: 40px;
+            padding: 40px 20px 10px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
 
         .card {
-            background: #1e293b;
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 500px;
-            margin: auto;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 14px;
+            padding: 15px;
+            transition: 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: #38bdf8;
+        }
+
+        .label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        .value {
+            font-size: 18px;
+            margin-top: 5px;
+            color: #f8fafc;
+            word-break: break-word;
+        }
+
+        .highlight {
+            color: #38bdf8;
+        }
+
+        .gps {
+            margin-top: 20px;
+            text-align: center;
         }
 
         button {
-            padding: 10px 20px;
-            margin-top: 15px;
+            padding: 12px 18px;
             border: none;
-            border-radius: 6px;
-            background: #38bdf8;
-            color: black;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+            color: #000;
+            font-weight: bold;
             cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
         }
 
-        p {
-            margin: 8px 0;
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        .loader {
+            color: #94a3b8;
+            font-size: 13px;
         }
     </style>
 </head>
+
 <body>
 
-    <h1>🌍 Location Intelligence</h1>
+<header>
+    <h1>🌍 Smart Location Intelligence</h1>
+    <p>Real-time IP + GPS-based environment analysis</p>
+</header>
 
-    <div class="card">
-        <h3>IP-Based Location</h3>
-        <p><b>IP:</b> <span id="ip"></span></p>
-        <p><b>Country:</b> <span id="country"></span></p>
-        <p><b>City:</b> <span id="city"></span></p>
-        <p><b>Region:</b> <span id="region"></span></p>
-        <p><b>Latitude:</b> <span id="lat"></span></p>
-        <p><b>Longitude:</b> <span id="lon"></span></p>
-        <p><b>Timezone:</b> <span id="timezone"></span></p>
-        <p><b>Postal Code:</b> <span id="postal"></span></p>
+<div class="container">
 
-        <button onclick="getExactLocation()">Get Exact Location</button>
+    <div class="grid">
 
-        <h3 style="margin-top:20px;">📍 Exact GPS Location</h3>
-        <p><b>Latitude:</b> <span id="gps-lat">-</span></p>
-        <p><b>Longitude:</b> <span id="gps-lon">-</span></p>
+        <div class="card">
+            <div class="label">IP Address</div>
+            <div class="value" id="ip">Loading...</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Country</div>
+            <div class="value" id="country">Loading...</div>
+        </div>
+
+        <div class="card">
+            <div class="label">City</div>
+            <div class="value" id="city">Loading...</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Region</div>
+            <div class="value" id="region">Loading...</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Latitude</div>
+            <div class="value highlight" id="lat">Loading...</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Longitude</div>
+            <div class="value highlight" id="lon">Loading...</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Timezone</div>
+            <div class="value" id="timezone">Loading...</div>
+        </div>
+
+        <div class="card">
+            <div class="label">Postal Code</div>
+            <div class="value" id="postal">Loading...</div>
+        </div>
+
     </div>
 
+<div class="gps">
+    <h3>📍 Precision GPS Layer</h3>
+
+    <button onclick="getExactLocation()">Get My Exact Location</button>
+
+    <p style="margin-top:15px;">
+        <b>Latitude:</b> <span id="gps-lat">-</span> |
+        <b>Longitude:</b> <span id="gps-lon">-</span>
+    </p>
+
+    <div id="shareBox" style="display:none; margin-top:15px;">
+        <p><b>Share your location:</b></p>
+
+        <button onclick="shareWhatsApp()">WhatsApp</button>
+        <button onclick="shareX()">X (Twitter)</button>
+        <button onclick="shareTelegram()">Telegram</button>
+        <button onclick="copyLink()">Copy Link</button>
+    </div>
+</div>
+
+</div>
+
 <script>
-    // Fetch backend data
-    fetch('/api/location')
+    // Load IP-based data
+    fetch('/api/location/')
         .then(res => res.json())
         .then(data => {
-            document.getElementById('ip').innerText = data.ip;
-            document.getElementById('country').innerText = data.country;
-            document.getElementById('city').innerText = data.city;
-            document.getElementById('region').innerText = data.region;
-            document.getElementById('lat').innerText = data.latitude;
-            document.getElementById('lon').innerText = data.longitude;
-            document.getElementById('timezone').innerText = data.timezone;
-            document.getElementById('postal').innerText = data.postal;
+
+            document.getElementById('ip').innerText = data.ip || "N/A";
+            document.getElementById('country').innerText = data.country || "N/A";
+            document.getElementById('city').innerText = data.city || "N/A";
+            document.getElementById('region').innerText = data.region || "N/A";
+            document.getElementById('lat').innerText = data.latitude || "N/A";
+            document.getElementById('lon').innerText = data.longitude || "N/A";
+            document.getElementById('timezone').innerText = data.timezone || "N/A";
+            document.getElementById('postal').innerText = data.postal || "N/A";
+        })
+        .catch(() => {
+            alert("Failed to load location data");
         });
 
-    // Get precise GPS location
+    // GPS location (user permission required)
     function getExactLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -79,8 +200,8 @@
                     document.getElementById('gps-lat').innerText = position.coords.latitude;
                     document.getElementById('gps-lon').innerText = position.coords.longitude;
                 },
-                function(error) {
-                    alert("Permission denied or unavailable");
+                function() {
+                    alert("Location access denied or unavailable");
                 }
             );
         } else {

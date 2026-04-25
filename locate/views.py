@@ -1,29 +1,39 @@
 from django.shortcuts import render
 import requests
+import requests
 from django.http import JsonResponse
 
-def get_client_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
-
 def location_view(request):
-    ip = get_client_ip(request)
+    ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR'))
+    ip = ip.split(',')[0] if ip else None
 
-    res = requests.get(f"https://ipapi.co/{ip}/json/")
-    data = res.json()
+    url = f"https://ipinfo.io/{ip}/json"
+
+    try:
+        response = requests.get(url, timeout=5)
+
+        # 👇 check if response is valid
+        if response.status_code != 200:
+            return JsonResponse({"error": "API failed", "status": response.status_code})
+
+        data = response.json()
+
+    except requests.exceptions.RequestException:
+        return JsonResponse({"error": "Request failed"})
+
+    except ValueError:
+        return JsonResponse({"error": "Invalid JSON response"})
+
+    loc = data.get("loc", "")
+    lat, lon = (loc.split(",") + [None, None])[:2]
 
     return JsonResponse({
         "ip": ip,
         "city": data.get("city"),
         "region": data.get("region"),
-        "country": data.get("country_name"),
-        "country_code": data.get("country_code"),
-        "latitude": data.get("latitude"),
-        "longitude": data.get("longitude"),
+        "country": data.get("country"),
+        "latitude": lat,
+        "longitude": lon,
         "timezone": data.get("timezone"),
         "postal": data.get("postal"),
     })
