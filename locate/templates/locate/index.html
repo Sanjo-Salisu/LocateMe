@@ -152,20 +152,22 @@
     </div>
 
 <div class="gps">
-    <h3>📍 Precision GPS Layer</h3>
+    <h3>📍 Location Sharing</h3>
 
-    <button onclick="getExactLocation()">Get My Exact Location</button>
+    <!-- ONE BUTTON ONLY -->
+    <button onclick="shareMyLocation()">Share My Location</button>
 
     <p style="margin-top:15px;">
         <b>Latitude:</b> <span id="gps-lat">-</span> |
         <b>Longitude:</b> <span id="gps-lon">-</span>
     </p>
 
+    <!-- Share options -->
     <div id="shareBox" style="display:none; margin-top:15px;">
-        <p><b>Share your location:</b></p>
+        <p><b>Share via:</b></p>
 
         <button onclick="shareWhatsApp()">WhatsApp</button>
-        <button onclick="shareX()">X (Twitter)</button>
+        <button onclick="shareX()">X</button>
         <button onclick="shareTelegram()">Telegram</button>
         <button onclick="copyLink()">Copy Link</button>
     </div>
@@ -210,5 +212,67 @@
     }
 </script>
 
+<script>
+let shareUrl = "";
+
+// 🌍 MAIN FUNCTION (DO EVERYTHING IN ONE CLICK)
+function shareMyLocation() {
+
+    if (!navigator.geolocation) {
+        alert("Geolocation not supported");
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            document.getElementById('gps-lat').innerText = lat;
+            document.getElementById('gps-lon').innerText = lon;
+
+            // create Google Maps link
+            shareUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+
+            // show share buttons
+            document.getElementById('shareBox').style.display = "block";
+
+        },
+        function(error) {
+            alert("Location permission denied or unavailable");
+            console.log(error);
+        }
+    );
+}
+
+// 📲 WHATSAPP
+function shareWhatsApp() {
+    window.location.href =
+        `https://wa.me/?text=My location: ${shareUrl}`;
+}
+
+// 🐦 X
+function shareX() {
+    window.open(
+        `https://twitter.com/intent/tweet?text=My location: ${shareUrl}`,
+        "_blank"
+    );
+}
+
+// ✈️ TELEGRAM
+function shareTelegram() {
+    window.open(
+        `https://t.me/share/url?url=${shareUrl}&text=My location`,
+        "_blank"
+    );
+}
+
+// 📋 COPY LINK
+function copyLink() {
+    navigator.clipboard.writeText(shareUrl);
+    alert("Location copied!");
+}
+</script>
 </body>
 </html>
